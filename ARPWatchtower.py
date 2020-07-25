@@ -70,6 +70,7 @@ while True:
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
         print_to_stderr('\nShutting Down.')
         proc.kill()
+        proc.kill()
         lines_printed=0
         for i in range(100): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()

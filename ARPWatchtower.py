@@ -80,6 +80,6 @@ while True:
                 lines_printed+=1
             else:
                 time.sleep(0.05)
-            if lines_printed > 2: break
+                if lines_printed > 2: break
         print_to_stderr('Exiting')
         exit()

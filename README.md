@@ -15,7 +15,7 @@ python3 ARPWatchtower.py en0 600
 
 Tested on macOS 10.15.6 and CentOS 8.2.
 
-For now, this script runs tcpdump with `--no-promiscuous-mode`. While there is no cli flag to disable that, feel free to remove it from the list of args to tcpdump if that is not desireable in your environment.
+Previously, this script ran with one additional option to tcpdump: `--no-promiscuous-mode`. While there is no cli flag to re-enable that, feel free to re-add it to  the list of args to tcpdump if that is not desireable in your environment.
 
 
 Suggested usecase is on a VM with two interfaces, one for interactive login/log egress/etc, and one with all your vlans trunked to it for monitoring (ensure that it is ifup'd, and recommend it has no IP addresses of its own). Pretty easy to mod to add graylog/ELK ingestion for whatever centralized logging you have using applicable libraries should you so desire (see location of the TODO message).

@@ -4,10 +4,14 @@ Simple wrapper for tcpdump to print MAC addr, IP addr, and VLAN number from ARP 
 Configurable caching time ensures that if you have particularly chatty hosts on your network, you only see one print/log per N seconds from said chatterbox.
 
 Usage:
+```
 python3 ARPWatchtower.py <interface name> <seconds to cache>
+```
 
 e.g.
+```
 python3 ARPWatchtower.py en0 600
+```
 
 Tested on macOS 10.15.6 and CentOS 8.2.
 

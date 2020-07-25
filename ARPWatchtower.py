@@ -14,7 +14,7 @@ except: interface='en0'
 try: cache_timeout_seconds=float(sys.argv[2])
 except: cache_timeout_seconds=6000
 
-cmd = ['tcpdump', '-nnlte','--no-promiscuous-mode', '-s', '64', '-i', interface, 'arp' ]
+cmd = ['tcpdump', '-nnlte', '-s', '64', '-i', interface, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 cache={}

@@ -71,9 +71,7 @@ while True:
         print_to_stderr('\nShutting Down.')
         proc.kill()
         proc.wait()
-        remainingLines='flag'
-        while len(remainingLines) > 0:
-            remainingLines=proc.stdout.readline().decode('utf-8').rstrip()
-            print_to_stderr(remainingLines)
-
-        print_to_stderr('\nExiting')
+        for i in range(5):
+            print_to_stderr(proc.stdout.readline().decode('utf-8').rstrip())
+        print_to_stderr('Exiting')
+        exit()

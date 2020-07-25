@@ -14,7 +14,7 @@ except: interface='en0'
 try: cache_timeout_seconds=float(sys.argv[2])
 except: cache_timeout_seconds=6000
 
-cmd = ['tcpdump', '-nnlte', '-s', '64', '-i', interface, 'arp' ]
+cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '64', '-i', interface, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 cache={}
@@ -70,7 +70,6 @@ while True:
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
         print_to_stderr('\nShutting Down.')
         proc.kill()
-        proc.kill()
         lines_printed=0
         for i in range(100): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
@@ -80,5 +79,6 @@ while True:
             else:
                 if lines_printed > 2: break
                 time.sleep(0.1)
+                proc.kill()
         print_to_stderr('Exiting')
         exit()

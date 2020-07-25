@@ -44,7 +44,7 @@ while True:
             except (IndexError): vlan=''
         else:
             print_to_stderr(line.rstrip())
-        if (ip=='0.0.0.0'): print_to_stderr(line)
+        
 
         if len(ip)>=7 and len(mac)==17: #minimal validation of IP and mac addr. It's ok if vlan is empty.
             key=ip+'@'+mac+'@'+vlan
@@ -55,6 +55,7 @@ while True:
             if not (key in cache):
                 cache[key]=(seconds,line)
                 print(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
+                if (ip=='0.0.0.0'): print_to_stderr(line)
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
         
         if (seconds-last_cache_full_vacuum > 30*cache_timeout_seconds): # Occasoinally evict everything we have not seen in a long time from the cache

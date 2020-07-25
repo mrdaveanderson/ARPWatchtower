@@ -14,7 +14,7 @@ except: interface='en0'
 try: cache_timeout_seconds=float(sys.argv[2])
 except: cache_timeout_seconds=6000
 
-cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '64', '-i', interface, 'arp' ]
+cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interface, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 cache={}
@@ -29,7 +29,6 @@ while True:
         ip=''
         vlan=''
         segments=[]
-        origline=line
         if 'Request' in line or 'Reply' in line:
             if 'Request' in line:
                 segments=line.split('Request')
@@ -45,7 +44,8 @@ while True:
             except (IndexError): vlan=''
         else:
             print_to_stderr(line.rstrip())
-        
+        if (ip=='0.0.0.0'): print_to_stderr(line)
+
         if len(ip)>=7 and len(mac)==17: #minimal validation of IP and mac addr. It's ok if vlan is empty.
             key=ip+'@'+mac+'@'+vlan
             if key in cache:
@@ -53,7 +53,7 @@ while True:
                 if value[0] < seconds-cache_timeout_seconds: # If it's older than cache_timeout_seconds in the past, evict from cache
                     cache.pop(key)
             if not (key in cache):
-                cache[key]=(seconds,origline)
+                cache[key]=(seconds,line)
                 print(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
         

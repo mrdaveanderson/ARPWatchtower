@@ -71,7 +71,9 @@ while True:
         print_to_stderr('\nShutting Down.')
         proc.kill()
         proc.wait()
-        for i in range(5):
-            print_to_stderr(proc.stdout.readline().decode('utf-8').rstrip())
+        for i in range(50): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
+            shutdownlog=proc.stdout.readline().decode('utf-8').rstrip()
+            if len(shutdownlog) > 5:
+                print_to_stderr(shutdownlog)
         print_to_stderr('Exiting')
         exit()

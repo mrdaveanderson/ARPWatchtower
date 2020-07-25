@@ -1,4 +1,4 @@
-# Written by Dave Anderson, released under Apache2 license
+# Author: Dave Anderson, released under Apache 2.0 License
 
 import datetime, os, subprocess, sys, time
 

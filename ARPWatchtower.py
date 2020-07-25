@@ -1,6 +1,6 @@
 # Author: Dave Anderson, released under Apache 2.0 License
 
-import datetime, os, subprocess, sys, time
+import datetime, os, signal, subprocess, sys, time
 
 def print_to_stderr(msg):
     sys.stderr.write(msg+'\n')
@@ -69,7 +69,8 @@ while True:
             print_to_stderr(str(datetime.datetime.now())+' '+'Info: Cache Vacuum: Evicting '+str(len(keys_to_evict))+', Remaining: '+str(len(cache)))
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
         print_to_stderr('\nShutting Down.')
-        proc.kill()
+        #proc.kill()
+        os.kill(proc.pid, signal.SIGINT)
         lines_printed=0
         for i in range(100): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
@@ -79,6 +80,7 @@ while True:
             else:
                 if lines_printed > 2: break
                 time.sleep(0.1)
-                proc.kill()
+                if i > 50: proc.kill()
+                elif i > 90: proc.terminate()    
         print_to_stderr('Exiting')
         exit()

@@ -68,10 +68,12 @@ while True:
                 cache.pop(key)
             print_to_stderr(str(datetime.datetime.now())+' '+'Info: Cache Vacuum: Evicting '+str(len(keys_to_evict))+', Remaining: '+str(len(cache)))
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
+        print_to_stderr('\nShutting Down.')
         proc.kill()
-        time.sleep(0.1) #just in case
+        proc.wait()
         remainingLines='flag'
-        print_to_stderr('\nExiting')
         while len(remainingLines) > 0:
             remainingLines=proc.stdout.readline().decode('utf-8').rstrip()
             print_to_stderr(remainingLines)
+
+        print_to_stderr('\nExiting')

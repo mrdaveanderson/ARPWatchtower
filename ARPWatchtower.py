@@ -6,13 +6,13 @@ def print_to_stderr(msg):
     sys.stderr.write(msg+'\n')
     sys.stderr.flush()
 
-cache_timeout_seconds=6000
+cache_timeout_seconds=28800 #8hrs
 interface=''
 try: interface=sys.argv[1]
 except: interface='en0'
 
 try: cache_timeout_seconds=float(sys.argv[2])
-except: cache_timeout_seconds=6000
+except: cache_timeout_seconds=28800 #8hrs
 
 cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interface, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
@@ -59,7 +59,7 @@ while True:
                 if not (ip=='0.0.0.0'): print(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
         
-        if (seconds-last_cache_full_vacuum > 30*cache_timeout_seconds): # Occasoinally evict everything we have not seen in a long time from the cache
+        if (seconds-last_cache_full_vacuum > 86400 ): # Every 24hrs evict everything we have not seen lately
             last_cache_full_vacuum=seconds
             keys_to_evict=[]
             for key in cache:

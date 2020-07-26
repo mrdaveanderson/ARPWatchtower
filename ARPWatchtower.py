@@ -29,13 +29,15 @@ while True:
         ip=''
         vlan=''
         segments=[]
-        if 'Request' in line or 'Reply' in line:
+        if 'Request' in line or 'Reply' in line or 'Probe' in line or 'Announcement' in line:
             if 'Request' in line:
                 segments=line.split('Request')
                 try: ip=segments[1].split('tell')[1].split()[0].rstrip()
                 except (IndexError): ip=''
-            elif 'Reply' in line:
-                segments=line.split('Reply')
+            else:
+                if 'Reply' in line:          segments=line.split('Reply')
+                elif 'Announcement' in line: segments=line.split('Announcement')
+                elif 'Probe' in line:        segments=line.split('Probe')
                 try: ip=segments[1].split()[0].rstrip()
                 except (IndexError): ip=''
             try: mac=segments[0].split()[0].rstrip()
@@ -73,7 +75,7 @@ while True:
         print_to_stderr('\nShutting Down.')
         os.kill(proc.pid, signal.SIGINT) #send a control-c
         lines_printed=0
-        for i in range(100): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
+        for i in range(50): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
             if len(final_output) > 5:
                 print_to_stderr(final_output)
@@ -81,7 +83,7 @@ while True:
             else:
                 if lines_printed > 2: break
                 time.sleep(0.1)
-                if i > 50: proc.kill()        #somehow it still might be alive, start sending kills
-                elif i > 90: proc.terminate() #still alive? send terminates.   
+                if i > 30: proc.kill()        #somehow it still might be alive, start sending kills
+                elif i > 47: proc.terminate() #still alive? send terminates.   
         print_to_stderr('Exiting')
         exit()

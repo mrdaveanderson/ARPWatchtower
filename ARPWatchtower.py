@@ -56,9 +56,7 @@ while True:
                     cache.pop(key)
             if not (key in cache):
                 cache[key]=(seconds,line)
-                #if (ip=='0.0.0.0'): print_to_stderr(line) #for now, we dont care about 0.0.0.0s being in stdout, but log them to the screen via stderr
                 if not (ip=='0.0.0.0'): print(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
-                
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
         
         if (seconds-last_cache_full_vacuum > 30*cache_timeout_seconds): # Occasoinally evict everything we have not seen in a long time from the cache

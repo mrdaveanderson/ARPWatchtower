@@ -35,9 +35,9 @@ while True:
                 try: ip=segments[1].split('tell')[1].split()[0].rstrip()
                 except (IndexError): ip=''
             else:
-                if 'Reply' in line:          segments=line.split('Reply')
+                if   'Reply'        in line: segments=line.split('Reply')
                 elif 'Announcement' in line: segments=line.split('Announcement')
-                elif 'Probe' in line:        segments=line.split('Probe')
+                elif 'Probe'        in line: segments=line.split('Probe')
                 try: ip=segments[1].split()[0].rstrip()
                 except (IndexError): ip=''
             try: mac=segments[0].split()[0].rstrip()

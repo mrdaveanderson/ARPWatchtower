@@ -45,7 +45,7 @@ while True:
             try: vlan=segments[0].split('vlan')[1].split()[0].rstrip()
             except (IndexError): vlan=''
         else:
-            print_to_stderr(str(datetime.datetime.now())+" "+line.rstrip())
+            print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
         
 
         if len(ip)>=7 and len(mac)==17: #minimal validation of IP and mac addr. It's ok if vlan is empty.
@@ -68,7 +68,7 @@ while True:
                     keys_to_evict.append(key)   #add to list of items to be evicted
             for key in keys_to_evict:           #actually evict keys
                 cache.pop(key)
-            print_to_stderr(str(datetime.datetime.now())+' '+'Info: Cache Vacuum: Evicting '+str(len(keys_to_evict))+', Remaining: '+str(len(cache)))
+            print_to_stderr(str(datetime.datetime.now())+'  '+'Info: Cache Vacuum: Evicting '+str(len(keys_to_evict))+', Remaining: '+str(len(cache)))
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
         print_to_stderr('\nShutting Down.')
         os.kill(proc.pid, signal.SIGINT) #send a control-c
@@ -76,7 +76,7 @@ while True:
         for i in range(50): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
             if len(final_output) > 5:
-                print_to_stderr(str(datetime.datetime.now())+" "+final_output)
+                print_to_stderr(str(datetime.datetime.now())+'  '+final_output)
                 lines_printed+=1
             else:
                 if lines_printed > 2: break

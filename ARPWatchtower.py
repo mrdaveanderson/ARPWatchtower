@@ -45,7 +45,7 @@ while True:
             try: vlan=segments[0].split('vlan')[1].split()[0].rstrip()
             except (IndexError): vlan=''
         else:
-            print_to_stderr(line.rstrip())
+            print_to_stderr(str(datetime.datetime.now())+" "+line.rstrip())
         
 
         if len(ip)>=7 and len(mac)==17: #minimal validation of IP and mac addr. It's ok if vlan is empty.
@@ -56,7 +56,7 @@ while True:
                     cache.pop(key)
             if not (key in cache):
                 cache[key]=(seconds,line)
-                if not (ip=='0.0.0.0'): print(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
+                if not (ip=='0.0.0.0'): print(datetime.datetime.now(),' IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan),' MAC='+mac)
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
         
         if (seconds-last_cache_full_vacuum > 86400 ): # Every 24hrs evict everything we have not seen lately
@@ -76,7 +76,7 @@ while True:
         for i in range(50): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
             if len(final_output) > 5:
-                print_to_stderr(final_output)
+                print_to_stderr(str(datetime.datetime.now())+" "+final_output)
                 lines_printed+=1
             else:
                 if lines_printed > 2: break

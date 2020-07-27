@@ -1,6 +1,6 @@
 # Author: Dave Anderson, released under Apache 2.0 License
 
-import datetime, os, signal, subprocess, sys, time
+import datetime, graypy, logging, os, signal, subprocess, sys, time
 
 def print_to_stderr(msg):
     sys.stderr.write(msg+'\n')
@@ -19,6 +19,19 @@ print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 cache={}
 last_cache_full_vacuum=time.time()
+
+graylog_enable=False
+graylog_hostname='localhost'
+graylog_port=12201
+graylogger=None
+try:
+    if graylog_enable:
+        graylogger=logging.getLogger('ARPWatchtower')
+        graylogger.setLevel(logging.INFO)
+        graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
+except: 
+    print_to_stderr(str(datetime.datetime.now())+'  Failed to configure graylog.')
+    graylogger=None
 
 while True:
     try:
@@ -56,8 +69,18 @@ while True:
                     cache.pop(key)
             if not (key in cache):
                 cache[key]=(seconds,line)
-                if not (ip=='0.0.0.0'): print(datetime.datetime.now(),' IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan),' MAC='+mac)
+                msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
+                if not (ip=='0.0.0.0'): print(msg)
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
+                try: 
+                    if graylogger and graylog_enable: graylogger.info(msg+"  "+line)
+                except Exception as e: 
+                    if isinstance(e,OSError):
+                        graylogger=None
+                        print_to_stderr('Failed to set up graylog, disabling grayloging functionality.')
+                    else:
+                        print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)
+
         
         if (seconds-last_cache_full_vacuum > 86400 ): # Every 24hrs evict everything we have not seen lately
             last_cache_full_vacuum=seconds

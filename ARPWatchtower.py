@@ -16,7 +16,7 @@ except: cache_timeout_seconds=28800 #8hrs
 
 for option in sys.argv:
     try:
-        print_to_stderr('')
+        print_to_stderr('got option: '+option)
     except Exception as e:
         print_to_stderr('Failed to parse arg: '+option+" reason: "+str(e))
 

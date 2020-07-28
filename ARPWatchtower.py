@@ -25,7 +25,7 @@ for option in sys.argv:
             graylog_port=int(subsegments[1])
         elif 'cacheseconds' in segments[0]:
             cache_timeout_seconds=int(segments[1])
-        elif 'help' or '?' in segments[0]:
+        elif 'help' in segments[0] or '?' in segments[0]:
             print_to_stderr('Optional arguments: \ninterfaces=<comma separated list of tcpdumpable interfaces>\ncacheseconds=<seconds to cache entries for>\ngrayloghost=example.host:1234\n\nexample: python3 ARPWatchtower.py interfaces=eth0 cacheseconds=600 grayloghost=example.com:12201')        
     except Exception as e:
         print_to_stderr('Failed to parse arg: '+option+" reason: "+str(e))

@@ -73,7 +73,7 @@ while True:
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
         
-        if len(ip)>=7 and len(mac)==17: #minimal validation of IP and mac addr. It's ok if vlan is empty.
+        if len(ip)>=7 and len(mac)==17 and ip!='0.0.0.0': #minimal validation of IP and mac addr. It's ok if vlan is empty.
             key=ip+'@'+mac+'@'+vlan
             if key in cache:
                 value=cache[key]
@@ -82,10 +82,9 @@ while True:
             if not (key in cache):
                 cache[key]=(seconds,line)
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
-                if not (ip=='0.0.0.0'): print(msg)
-                #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
-                try: 
-                    if graylogger and not (ip=='0.0.0.0'): graylogger.info(msg+"\n"+line)
+                print(msg)   #Print the output to stdout to enable file redirection, etc
+                try:         #Try to log the same message to graylog
+                    if graylogger: graylogger.info(msg+"\n"+line)
                 except Exception as e:
                     graylogger=None
                     print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)

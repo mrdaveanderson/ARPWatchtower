@@ -103,20 +103,16 @@ while True:
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
         print_to_stderr('\nShutting Down.')
         os.kill(proc.pid, signal.SIGINT) #send a control-c
-        #lines_printed=0
-        empty_lines=0
-        for i in range(50): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
+        time.sleep(0.1)
+        seconds=time.time()
+        while True: #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
             if len(final_output) > 5:
                 print_to_stderr(str(datetime.datetime.now())+'  '+final_output)
-                #lines_printed+=1
+                seconds-=0.1
             else:
-                #if lines_printed > 2: break
-                if empty_lines > 10: break
-                empty_lines+=1
-                time.sleep(0.1)
-                #print_to_stderr('Empty')
-                #if i > 30: proc.kill()        #somehow it still might be alive, start sending kills
-                #elif i > 47: proc.terminate() #still alive? send terminates.   
+                if time.time()-0.5 > seconds: break
+                time.sleep(0.02)
+                print_to_stderr('Slept')
         print_to_stderr('Exiting')
         exit()

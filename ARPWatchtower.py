@@ -10,10 +10,13 @@ cache_timeout_seconds=28800 #8hrs
 interfaces='en0'
 graylog_hostname=''
 graylog_port=12201
+cache={}
+last_cache_full_vacuum=time.time()
+graylogger=None
+
 for option in sys.argv:
     try:
         segments=option.split('=')
-        print_to_stderr('got option: '+option)
         if 'interfaces' in segments[0]:
             interfaces=segments[1]
         elif 'grayloghost' in segments[0]:
@@ -27,15 +30,11 @@ for option in sys.argv:
     except Exception as e:
         print_to_stderr('Failed to parse arg: '+option+" reason: "+str(e))
 
-
 print('ARPWatchtower.py starting with args: interfaces:',interfaces,'cacheseconds:',cache_timeout_seconds,'grayloghost:',graylog_hostname,'graylogport',graylog_port)
 cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interfaces, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-cache={}
-last_cache_full_vacuum=time.time()
 
-graylogger=None
 try:
     if graylog_hostname:
         graypy=importlib.import_module('graypy') #import graypy
@@ -74,7 +73,6 @@ while True:
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
         
-
         if len(ip)>=7 and len(mac)==17: #minimal validation of IP and mac addr. It's ok if vlan is empty.
             key=ip+'@'+mac+'@'+vlan
             if key in cache:
@@ -92,7 +90,6 @@ while True:
                     graylogger=None
                     print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)
 
-        
         if (seconds-last_cache_full_vacuum > 86400 ): # Every 24hrs evict everything we have not seen lately
             last_cache_full_vacuum=seconds
             keys_to_evict=[]
@@ -106,16 +103,20 @@ while True:
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
         print_to_stderr('\nShutting Down.')
         os.kill(proc.pid, signal.SIGINT) #send a control-c
-        lines_printed=0
+        #lines_printed=0
+        empty_lines=0
         for i in range(50): #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
             if len(final_output) > 5:
                 print_to_stderr(str(datetime.datetime.now())+'  '+final_output)
-                lines_printed+=1
+                #lines_printed+=1
             else:
-                if lines_printed > 2: break
+                #if lines_printed > 2: break
+                if empty_lines > 10: break
+                empty_lines+=1
                 time.sleep(0.1)
-                if i > 30: proc.kill()        #somehow it still might be alive, start sending kills
-                elif i > 47: proc.terminate() #still alive? send terminates.   
+                #print_to_stderr('Empty')
+                #if i > 30: proc.kill()        #somehow it still might be alive, start sending kills
+                #elif i > 47: proc.terminate() #still alive? send terminates.   
         print_to_stderr('Exiting')
         exit()

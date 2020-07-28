@@ -23,7 +23,7 @@ last_cache_full_vacuum=time.time()
 # TODO: figure out how to make it so installing graypy is optional
 # TODO: improve arg parsing so that getting graylog host/port is a reasonable addition
 graylog_hostname=''
-graylog_port=0
+graylog_port=12201
 graylogger=None
 try:
     if graylog_hostname:

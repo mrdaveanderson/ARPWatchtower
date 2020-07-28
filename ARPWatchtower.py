@@ -7,31 +7,34 @@ def print_to_stderr(msg):
     sys.stderr.flush()
 
 cache_timeout_seconds=28800 #8hrs
-interface=''
-try: interface=sys.argv[1]
-except: interface='en0'
-
-try: cache_timeout_seconds=float(sys.argv[2])
-except: cache_timeout_seconds=28800 #8hrs
-
+interfaces='en0'
+graylog_hostname=''
+graylog_port=12201
 for option in sys.argv:
     try:
+        segments=option.split('=')
         print_to_stderr('got option: '+option)
+        if 'interfaces' in segments[0]:
+            interfaces=segments[1]
+        elif 'grayloghost' in segments[0]:
+            subsegments=segments[1].split(':')
+            graylog_hostname=subsegments[0]
+            graylog_port=int(subsegments[1])
+        elif 'cacheseconds' in segments[0]:
+            cache_timeout_seconds=int(segments[1])
+        elif 'help' or '?' in segments[0]:
+            print_to_stderr('Optional arguments: \ninterfaces=<comma separated list of tcpdumpable interfaces>\ncacheseconds=<seconds to cache entries for>\ngrayloghost=example.host:1234\n\nexample: python3 ARPWatchtower.py interfaces=eth0 cacheseconds=600 grayloghost=example.com:12201')        
     except Exception as e:
         print_to_stderr('Failed to parse arg: '+option+" reason: "+str(e))
 
 
-
-cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interface, 'arp' ]
+print('ARPWatchtower.py starting with args: interfaces:',interfaces,'cacheseconds:',cache_timeout_seconds,'grayloghost:',graylog_hostname,'graylogport',graylog_port)
+cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interfaces, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 cache={}
 last_cache_full_vacuum=time.time()
 
-
-# TODO: improve arg parsing so that getting graylog host/port is a reasonable addition
-graylog_hostname=''
-graylog_port=12201
 graylogger=None
 try:
     if graylog_hostname:

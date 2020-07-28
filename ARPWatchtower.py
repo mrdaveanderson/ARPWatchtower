@@ -101,9 +101,10 @@ while True:
                 cache.pop(key)
             print_to_stderr(str(datetime.datetime.now())+'  '+'Info: Cache Vacuum: Evicting '+str(len(keys_to_evict))+', Remaining: '+str(len(cache)))
     except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
-        print_to_stderr('\nShutting Down.')
+        print_to_stderr('\n'+str(datetime.datetime.now())+'  shutdown requested, cleaning up.')
         os.kill(proc.pid, signal.SIGINT) #send a control-c
         time.sleep(0.1)
+        print_to_stderr(str(datetime.datetime.now())+'  -- tcpdump stats --')
         seconds=time.time()
         while True: #there may be various pending amount of crap in the buffer, iterate through, print anything that seems printable, then exit
             final_output=proc.stdout.readline().decode('utf-8').rstrip()
@@ -113,6 +114,5 @@ while True:
             else:
                 if time.time()-0.5 > seconds: break
                 time.sleep(0.02)
-                print_to_stderr('Slept')
-        print_to_stderr('Exiting')
+        print_to_stderr(str(datetime.datetime.now())+'  -- clean exit --')
         exit()

@@ -1,6 +1,6 @@
 # Author: Dave Anderson, released under Apache 2.0 License
 
-import datetime, graypy, logging, os, signal, subprocess, sys, time
+import datetime, importlib, logging, os, signal, subprocess, sys, time
 
 def print_to_stderr(msg):
     sys.stderr.write(msg+'\n')
@@ -14,25 +14,34 @@ except: interface='en0'
 try: cache_timeout_seconds=float(sys.argv[2])
 except: cache_timeout_seconds=28800 #8hrs
 
+for option in sys.argv:
+    try:
+        print_to_stderr('')
+    except Exception as e:
+        print_to_stderr('Failed to parse arg: '+option+" reason: "+str(e))
+
+
+
 cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interface, 'arp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 cache={}
 last_cache_full_vacuum=time.time()
 
-# TODO: figure out how to make it so installing graypy is optional
+
 # TODO: improve arg parsing so that getting graylog host/port is a reasonable addition
 graylog_hostname=''
 graylog_port=12201
 graylogger=None
 try:
     if graylog_hostname:
+        graypy=importlib.import_module('graypy') #import graypy
         graylogger=logging.getLogger('ARPWatchtower')
         graylogger.setLevel(logging.INFO)
         graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
     else: print_to_stderr('No graylog host defined, skipping')
-except: 
-    print_to_stderr(str(datetime.datetime.now())+'  Failed to configure graylog.')
+except Exception as e: 
+    print_to_stderr(str(datetime.datetime.now())+'  Failed to configure graylog. Error: '+str(e))
     graylogger=None
 
 while True:

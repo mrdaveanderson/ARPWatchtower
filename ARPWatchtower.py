@@ -99,7 +99,7 @@ while True:
             for key in keys_to_evict:           #actually evict keys
                 cache.pop(key)
             print_to_stderr(str(datetime.datetime.now())+'  '+'Info: Cache Vacuum: Evicting '+str(len(keys_to_evict))+', Remaining: '+str(len(cache)))
-    except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit 
+    except KeyboardInterrupt: # print the summary from tcpdump when we shut it down, then exit (TODO: is there a nother kind of interrupt if we get SIGINT from another proc?)
         print_to_stderr('\n'+str(datetime.datetime.now())+'  shutdown requested, cleaning up.')
         os.kill(proc.pid, signal.SIGINT) #send a control-c
         time.sleep(0.1)

@@ -20,15 +20,17 @@ proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subproc
 cache={}
 last_cache_full_vacuum=time.time()
 
-graylog_enable=False
-graylog_hostname='localhost'
-graylog_port=12201
+# TODO: figure out how to make it so installing graypy is optional
+# TODO: improve arg parsing so that getting graylog host/port is a reasonable addition
+graylog_hostname=''
+graylog_port=0
 graylogger=None
 try:
-    if graylog_enable:
+    if graylog_hostname:
         graylogger=logging.getLogger('ARPWatchtower')
         graylogger.setLevel(logging.INFO)
         graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
+    else: print_to_stderr('No graylog host defined, skipping')
 except: 
     print_to_stderr(str(datetime.datetime.now())+'  Failed to configure graylog.')
     graylogger=None
@@ -73,13 +75,10 @@ while True:
                 if not (ip=='0.0.0.0'): print(msg)
                 #TODO: this is the location where graylog/ELK integration would happen (send same string as above)
                 try: 
-                    if graylogger and graylog_enable: graylogger.info(msg+"  "+line)
-                except Exception as e: 
-                    if isinstance(e,OSError):
-                        graylogger=None
-                        print_to_stderr('Failed to set up graylog, disabling grayloging functionality.')
-                    else:
-                        print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)
+                    if graylogger and not (ip=='0.0.0.0'): graylogger.info(msg+"\n"+line)
+                except Exception as e:
+                    graylogger=None
+                    print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)
 
         
         if (seconds-last_cache_full_vacuum > 86400 ): # Every 24hrs evict everything we have not seen lately

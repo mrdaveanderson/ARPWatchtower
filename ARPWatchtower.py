@@ -94,7 +94,7 @@ while True:
             keys_to_evict=[]
             for key in cache:
                 value=cache[key]
-                if value[0] < seconds-cache_timeout_seconds:
+                if value[0] < seconds-(cache_timeout_seconds*3):
                     keys_to_evict.append(key)   #add to list of items to be evicted
             for key in keys_to_evict:           #actually evict keys
                 cache.pop(key)

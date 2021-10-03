@@ -14,7 +14,7 @@ cache={}
 last_cache_full_vacuum=time.time()
 graylogger=None
 maclookup=None
-quiet=False
+propagate=False #default is to only use graylog if configured, not also spam local syslog, set propagate to true if you want that
 
 for option in sys.argv:
     try:
@@ -27,8 +27,8 @@ for option in sys.argv:
             graylog_port=int(subsegments[1])
         elif 'cacheseconds' in segments[0]:
             cache_timeout_seconds=int(segments[1])
-        elif 'quiet' in segments[0]:
-            quiet=True
+        elif 'propigate' in segments[0]:
+            propagate=True
         elif 'help' in segments[0] or '?' in segments[0]:
             print_to_stderr('Optional arguments: \ninterfaces=<comma separated list of tcpdumpable interfaces>\ncacheseconds=<seconds to cache entries for>\ngrayloghost=example.host:1234\n\nexample: python3 ARPWatchtower.py interfaces=eth0 cacheseconds=600 grayloghost=example.com:12201')        
     except Exception as e:
@@ -43,7 +43,7 @@ try:
     if graylog_hostname:
         graypy=importlib.import_module('graypy') #import graypy
         graylogger=logging.getLogger('ARPWatchtower')
-        graylogger.propagate=False
+        graylogger.propagate=propagate
         graylogger.setLevel(logging.INFO)
         graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
         print_to_stderr('Successfully configured UDP GELF to host='+graylog_hostname+':'+str(graylog_port))

@@ -14,6 +14,7 @@ cache={}
 last_cache_full_vacuum=time.time()
 graylogger=None
 maclookup=None
+quiet=False
 
 for option in sys.argv:
     try:
@@ -26,6 +27,8 @@ for option in sys.argv:
             graylog_port=int(subsegments[1])
         elif 'cacheseconds' in segments[0]:
             cache_timeout_seconds=int(segments[1])
+        elif 'quiet' in segments[0]:
+            quiet=True
         elif 'help' in segments[0] or '?' in segments[0]:
             print_to_stderr('Optional arguments: \ninterfaces=<comma separated list of tcpdumpable interfaces>\ncacheseconds=<seconds to cache entries for>\ngrayloghost=example.host:1234\n\nexample: python3 ARPWatchtower.py interfaces=eth0 cacheseconds=600 grayloghost=example.com:12201')        
     except Exception as e:
@@ -102,7 +105,8 @@ while True:
                     except Exception as e:
                         oui_string=''
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)
-                print(msg)   #Print the output to stdout to enable file redirection, etc
+                if not quiet:
+                    print(msg)   #Print the output to stdout to enable file redirection, etc
                 try:         #Try to log the same message to graylog
                     if graylogger: graylogger.info(msg+'\n'+line)
                 except Exception as e:

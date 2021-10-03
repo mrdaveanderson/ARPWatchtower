@@ -107,8 +107,7 @@ while True:
                     except Exception as e:
                         oui_string=''
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)
-                if not quiet:
-                    print(msg)   #Print the output to stdout to enable file redirection, etc
+                print(msg)   #Print the output to stdout to enable file redirection, etc
                 try:         #Try to log the same message to graylog
                     if graylogger: graylogger.info(msg+'\n'+line)
                 except Exception as e:

@@ -89,7 +89,7 @@ while True:
             except (IndexError): vlan=''
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
-        
+
         if len(ip)>=7 and len(mac)==17 and ip!='0.0.0.0': #minimal validation of IP and mac addr. It's ok if vlan is empty.
             key=ip+'@'+mac+'@'+vlan
             if key in cache:

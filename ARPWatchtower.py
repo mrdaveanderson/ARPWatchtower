@@ -97,11 +97,14 @@ while True:
                 cache[key]=(seconds,line)
                 oui_string=''
                 if maclookup:
-                    oui_string='  Vendor='+maclookup.lookup(mac)
+                    try:
+                        oui_string='  Vendor='+maclookup.lookup(mac)
+                    except Exception as e:
+                        oui_string=''
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)
                 print(msg)   #Print the output to stdout to enable file redirection, etc
                 try:         #Try to log the same message to graylog
-                    if graylogger: graylogger.info(msg+"\n"+line)
+                    if graylogger: graylogger.info(msg+'\n'+line)
                 except Exception as e:
                     graylogger=None
                     print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)

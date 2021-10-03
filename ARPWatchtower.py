@@ -13,6 +13,7 @@ graylog_port=12201
 cache={}
 last_cache_full_vacuum=time.time()
 graylogger=None
+maclookup=None
 
 for option in sys.argv:
     try:
@@ -43,8 +44,21 @@ try:
         graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
     else: print_to_stderr('No graylog host defined, skipping')
 except Exception as e: 
-    print_to_stderr(str(datetime.datetime.now())+'  Failed to configure graylog. Error: '+str(e))
+    print_to_stderr(str(datetime.datetime.now())+'  Warn: Failed to configure graylog. Error: '+str(e))
     graylogger=None
+
+try:
+    mac_lookup_lib=importlib.import_module('mac_vendor_lookup')
+    maclookup=mac_lookup_lib.MacLookup()
+    try:
+        print_to_stderr('Attempting to update OUI/Mac vendor lookup tables.')
+        maclookup.update_vendors()
+        print_to_stderr('Successfully updated OUI/Mac vendor lookup tables.')
+    except Exception as e:
+        print_to_stderr(str(datetime.datetime.now())+'  Warn: failed to update OUI database. Error: '+str(e))
+except Exception as e: 
+    print_to_stderr(str(datetime.datetime.now())+'  Warn: failed to configure mac/oui lookup utility. Error: '+str(e))
+    maclookup=None
 
 while True:
     try:
@@ -81,14 +95,16 @@ while True:
                     cache.pop(key)
             if not (key in cache):
                 cache[key]=(seconds,line)
-                msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac)
+                oui_string=''
+                if maclookup:
+                    oui_string='  Vendor='+maclookup.lookup(mac)
+                msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)
                 print(msg)   #Print the output to stdout to enable file redirection, etc
                 try:         #Try to log the same message to graylog
                     if graylogger: graylogger.info(msg+"\n"+line)
                 except Exception as e:
                     graylogger=None
                     print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)
-
         if (seconds-last_cache_full_vacuum > 86400 ): # Every 24hrs evict everything we have not seen lately
             last_cache_full_vacuum=seconds
             keys_to_evict=[]

@@ -43,6 +43,8 @@ try:
     if graylog_hostname:
         graypy=importlib.import_module('graypy') #import graypy
         graylogger=logging.getLogger('ARPWatchtower')
+        graylogger.propagate=False
+        graylogger.removeHandler()
         graylogger.setLevel(logging.INFO)
         graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
         print_to_stderr('Successfully configured UDP GELF to host='+graylog_hostname+':'+str(graylog_port))

@@ -45,6 +45,7 @@ try:
         graylogger=logging.getLogger('ARPWatchtower')
         graylogger.setLevel(logging.INFO)
         graylogger.addHandler(graypy.GELFUDPHandler(graylog_hostname, graylog_port))
+        print_to_stderr('Successfully configured UDP GELF to host='+graylog_hostname+':'+graylog_port)
     else: print_to_stderr('No graylog host defined, skipping')
 except Exception as e: 
     print_to_stderr(str(datetime.datetime.now())+'  Warn: Failed to configure graylog. Error: '+str(e))

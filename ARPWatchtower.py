@@ -92,7 +92,11 @@ while True:
             except (IndexError): vlan=''
         elif 'ethertype IPv4' in line and 'vhid' in line:
             msgType='carp'
-            print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
+            mac=line.split()[0]
+            ip=line.split('ethertype IPv4')[1].split()[0].rstrip()
+            vlan=line.split('vlan')[1].split().rstrip()
+            print_to_stderr(str(datetime.datetime.now())+'CARP:  ','mac='+mac,'ip='+ip,'vlan='+vlan)
+            #print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
             # add forthcoming CARP stuff here
             continue #remove after the above section is complete
         else:

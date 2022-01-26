@@ -96,8 +96,9 @@ while True:
             ip=line.split('ethertype IPv4')[1].split()[0].rstrip()
             vlan=line.split('vlan ')[1].split()[0]
             vhid=line.split('vhid=')[1].split()[0]
+            base_skew_counter=line.split('vhid=')[1].replace(' ','_')
             msgType='carp'+vhid
-            #print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip+' carp_vhid='+vhid)
+            print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip+' carp_vhid='+vhid+' linend='+base_skew_counter)
             #print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
             # add forthcoming CARP stuff here
             #continue #remove after the above section is complete

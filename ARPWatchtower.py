@@ -92,16 +92,19 @@ while True:
             try: vlan=segments[0].split('vlan')[1].split()[0].rstrip()
             except (IndexError): vlan=''
         elif 'ethertype IPv4' in line and 'vhid' in line:
-            mac=line.split()[0]
-            ip=line.split('ethertype IPv4')[1].split()[0].rstrip()
-            vlan=line.split('vlan ')[1].split()[0]
-            vhid=line.split('vhid=')[1].split()[0]
-            base_skew_counter=line.split('vhid=')[1].replace(' ','_')
+            try: mac=line.split()[0]
+            except (IndexError): mac=''
+            try: ip=line.split('ethertype IPv4')[1].split()[0].rstrip()
+            except (IndexError): ip=''
+            try: vlan=line.split('vlan ')[1].split()[0]
+            except (IndexError): vlan=''
+            try: vhid=line.split('vhid=')[1].split()[0]
+            except (IndexError): vhid=''
+            try: base_skew_counter=line.split('vhid=')[1].replace(' ','_')
+            except (IndexError): base_skew_counter=''
             msgType='carp'+base_skew_counter
             #print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip+' carp_vhid='+vhid+' linend='+base_skew_counter)
             #print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
-            # add forthcoming CARP stuff here
-            #continue #remove after the above section is complete
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
 

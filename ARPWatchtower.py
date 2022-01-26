@@ -73,6 +73,7 @@ while True:
         mac=''
         ip=''
         vlan=''
+        vhid=''
         msgType='arp'
         segments=[]
         if 'ethertype ARP' in line and ('Request' in line or 'Reply' in line or 'Probe' in line or 'Announcement' in line):
@@ -91,14 +92,15 @@ while True:
             try: vlan=segments[0].split('vlan')[1].split()[0].rstrip()
             except (IndexError): vlan=''
         elif 'ethertype IPv4' in line and 'vhid' in line:
-            msgType='carp'
             mac=line.split()[0]
             ip=line.split('ethertype IPv4')[1].split()[0].rstrip()
             vlan=line.split('vlan ')[1].split()[0]
-            print_to_stderr(str(datetime.datetime.now())+'CARP:  mac='+mac+' ip='+ip+' vlan='+vlan)
+            #print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip)
+            vhid=line.split('vhid=')[1].split()[0]
+            msgType='carp'+vhid
             #print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
             # add forthcoming CARP stuff here
-            continue #remove after the above section is complete
+            #continue #remove after the above section is complete
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
 
@@ -111,9 +113,14 @@ while True:
             if not (key in cache):
                 cache[key]=(seconds,line)
                 oui_string=''
-                if maclookup:
+                if 'arp' in msgType and maclookup:
                     try:
                         oui_string='  Vendor='+maclookup.lookup(mac)
+                    except Exception as e:
+                        oui_string=''
+                elif 'carp' in msgType:
+                    try:
+                        oui_string='  CARP_VHID='+vhid
                     except Exception as e:
                         oui_string=''
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)

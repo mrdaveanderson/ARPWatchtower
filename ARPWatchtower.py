@@ -95,10 +95,10 @@ while True:
             mac=line.split()[0]
             ip=line.split('ethertype IPv4')[1].split()[0].rstrip()
             vlan=line.split('vlan ')[1].split()[0]
-            #print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip)
             vhid=line.split('vhid=')[1].split()[0]
             msgType='carp'+vhid
-            #print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
+            print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip+' carp_vhid='+vhid)
+            print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
             # add forthcoming CARP stuff here
             #continue #remove after the above section is complete
         else:

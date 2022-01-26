@@ -122,6 +122,7 @@ while True:
                     try:
                         oui_string='  CARP_VHID='+vhid
                     except Exception as e:
+                        print_to_stderr(str(e))
                         oui_string=''
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)
                 print(msg)   #Print the output to stdout to enable file redirection, etc

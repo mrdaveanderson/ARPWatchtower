@@ -73,6 +73,7 @@ while True:
         mac=''
         ip=''
         vlan=''
+        msgType='arp'
         segments=[]
         if 'ethertype ARP' in line and ('Request' in line or 'Reply' in line or 'Probe' in line or 'Announcement' in line):
             if 'Request' in line:
@@ -90,13 +91,14 @@ while True:
             try: vlan=segments[0].split('vlan')[1].split()[0].rstrip()
             except (IndexError): vlan=''
         elif 'ethertype IPv4' in line and 'vhid' in line:
+            msgType='carp'
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
             # add forthcoming CARP stuff here
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
 
         if len(ip)>=7 and len(mac)==17 and ip!='0.0.0.0': #minimal validation of IP and mac addr. It's ok if vlan is empty.
-            key=ip+'@'+mac+'@'+vlan
+            key=ip+'@'+mac+'@'+vlan+'@'+msgType
             if key in cache:
                 value=cache[key]
                 if value[0] < seconds-cache_timeout_seconds: # If it's older than cache_timeout_seconds in the past, evict from cache

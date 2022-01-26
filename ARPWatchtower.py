@@ -94,6 +94,7 @@ while True:
             msgType='carp'
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
             # add forthcoming CARP stuff here
+            continue #remove after the above section is complete
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
 

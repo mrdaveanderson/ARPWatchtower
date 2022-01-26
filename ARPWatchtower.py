@@ -35,7 +35,7 @@ for option in sys.argv:
         print_to_stderr('Failed to parse arg: '+option+" reason: "+str(e))
 
 print('ARPWatchtower.py starting with args: interfaces:',interfaces,'cacheseconds:',cache_timeout_seconds,'grayloghost:',graylog_hostname,'graylogport',graylog_port)
-cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interfaces, 'arp' ]
+cmd = ['tcpdump', '-B', '10240', '-nnlte', '-s', '128', '-i', interfaces, 'arp', 'or', '-T', 'carp', 'carp' ]
 print_to_stderr('Starting tcpdump with options: '+str(cmd))
 proc = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -74,7 +74,7 @@ while True:
         ip=''
         vlan=''
         segments=[]
-        if 'Request' in line or 'Reply' in line or 'Probe' in line or 'Announcement' in line:
+        if 'ethertype ARP' in line and ('Request' in line or 'Reply' in line or 'Probe' in line or 'Announcement' in line):
             if 'Request' in line:
                 segments=line.split('Request')
                 try: ip=segments[1].split('tell')[1].split()[0].rstrip()
@@ -89,6 +89,9 @@ while True:
             except (IndexError): mac=''
             try: vlan=segments[0].split('vlan')[1].split()[0].rstrip()
             except (IndexError): vlan=''
+        elif 'ethertype IPv4' in line and 'vhid' in line:
+            print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
+            # add forthcoming CARP stuff here
         else:
             print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
 

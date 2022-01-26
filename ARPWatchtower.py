@@ -113,16 +113,15 @@ while True:
             if not (key in cache):
                 cache[key]=(seconds,line)
                 oui_string=''
-                if 'arp' in msgType and maclookup:
-                    try:
-                        oui_string='  Vendor='+maclookup.lookup(mac)
-                    except Exception as e:
-                        oui_string=''
-                elif 'carp' in msgType:
+                if 'carp' in msgType:
                     try:
                         oui_string='  CARP_VHID='+vhid
                     except Exception as e:
-                        print_to_stderr(str(e))
+                        oui_string=''
+                elif 'arp' in msgType and maclookup:
+                    try:
+                        oui_string='  Vendor='+maclookup.lookup(mac)
+                    except Exception as e:
                         oui_string=''
                 msg=(str(datetime.datetime.now())+'  IP='+'{:16}'.format(ip)+'VLAN='+'{:4}'.format(vlan)+'  MAC='+mac+oui_string)
                 print(msg)   #Print the output to stdout to enable file redirection, etc

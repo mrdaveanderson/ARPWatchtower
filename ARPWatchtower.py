@@ -134,7 +134,7 @@ while True:
                 except Exception as e:
                     graylogger=None
                     print_to_stderr('failed to log to graylog: e='+str(e)+"\ntraceback:"+e.__traceback__)
-        if (seconds-last_cache_full_vacuum > 7200 ): # Every 24hrs evict everything we have not seen in the last two hours
+        if (seconds-last_cache_full_vacuum > 7200 ): # Every 2hrs evict everything we have not seen lately
             last_cache_full_vacuum=seconds
             keys_to_evict=[]
             for key in cache:

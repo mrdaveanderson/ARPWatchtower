@@ -102,7 +102,7 @@ while True:
             except (IndexError): vhid=''
             try: base_skew_counter=line.split('vhid=')[1].replace(' ','_')
             except (IndexError): base_skew_counter=''
-            msgType='carp'#+base_skew_counter
+            msgType='carp_vhid'+vhid
             #print_to_stderr(str(datetime.datetime.now())+' CARP:  mac='+mac+' vlan='+vlan+' ip='+ip+' carp_vhid='+vhid+' linend='+base_skew_counter)
             #print_to_stderr(str(datetime.datetime.now())+'  '+line.rstrip())
         else:
